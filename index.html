@@ -1,7 +1,3 @@
-
-Kalorie tracker · HTML
-Kopieren
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -18,7 +14,7 @@ Kopieren
     body{overscroll-behavior:none}
     textarea,input,button{-webkit-appearance:none;font-family:inherit}
     ::-webkit-scrollbar{display:none}
- 
+
     /* SETUP */
     #setup{position:fixed;inset:0;background:#080b14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:100}
     #setup .icon{font-size:52px;margin-bottom:16px}
@@ -33,11 +29,11 @@ Kopieren
     #setup input:focus{outline:none;border-color:#4ade80}
     #setup button{width:100%;max-width:400px;padding:14px;border-radius:14px;border:none;background:#4ade80;color:#080b14;font-size:15px;font-weight:700;cursor:pointer}
     #setup .err{color:#f87171;font-size:12px;margin-top:6px;text-align:center}
- 
+
     /* APP */
     #app{display:none;min-height:100vh}
     #app.on{display:block}
- 
+
     .nav{position:sticky;top:0;z-index:10;background:#080b14;border-bottom:1px solid #1e2640;padding:14px 20px;padding-top:max(14px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center}
     .nav-sub{font-size:10px;color:#4a5568;letter-spacing:2px;text-transform:uppercase}
     .nav-title{font-size:15px;font-weight:700}
@@ -45,52 +41,52 @@ Kopieren
     .tab{padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer}
     .tab.on{background:#4ade80;color:#080b14}
     .tab:not(.on){background:#141928;color:#4a5568}
- 
+
     .wrap{max-width:480px;margin:0 auto;padding:20px 16px 100px}
- 
+
     .card{background:#0f1420;border-radius:24px;border:1px solid #1e2640;padding:24px;margin-bottom:16px}
     .sec-label{font-size:11px;font-weight:600;color:#4a5568;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
- 
+
     /* Ring */
     .ring-wrap{position:relative;width:176px;height:176px;margin:0 auto}
     .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
     .ring-num{font-size:30px;font-weight:800;line-height:1}
     .ring-sub{font-size:11px;color:#4a5568;margin-top:2px}
- 
+
     .macro-bar{display:flex;height:6px;border-radius:99px;overflow:hidden;gap:2px;margin-top:16px}
     .macro-row{display:flex;justify-content:space-between;margin-top:8px}
     .macro-item{text-align:center}
     .macro-val{font-size:13px;font-weight:700}
     .macro-lbl{font-size:10px;color:#4a5568}
- 
+
     .stat-row{display:flex;gap:8px;margin-top:16px}
     .stat-box{flex:1;background:#141928;border-radius:14px;padding:12px;text-align:center}
     .stat-val{font-size:15px;font-weight:700}
     .stat-lbl{font-size:11px;color:#4a5568;margin-top:2px}
     .over{margin-top:12px;background:rgba(127,29,29,.2);border:1px solid #f87171;border-radius:12px;padding:8px 14px;font-size:13px;color:#f87171;text-align:center}
- 
+
     .type-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
     .type-btn{padding:5px 12px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer}
     .type-btn.on{background:#4ade80;color:#080b14}
     .type-btn:not(.on){background:#141928;color:#4a5568}
- 
+
     .img-prev{position:relative;margin-bottom:10px}
     .img-prev img{width:100%;max-height:180px;object-fit:cover;border-radius:14px}
     .img-x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);border:none;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
     .img-badge{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,.75);border-radius:8px;padding:3px 8px;font-size:11px;color:#4ade80}
- 
+
     textarea.input{width:100%;background:#080b14;border:1px solid #1e2640;border-radius:14px;padding:12px;color:#e2e8f0;font-size:14px;resize:none;line-height:1.5}
     textarea.input:focus{outline:none;border-color:#4ade80}
     .err-msg{color:#f87171;font-size:12px;margin-top:6px}
- 
+
     .add-row{display:flex;gap:8px;margin-top:10px}
     .cam-btn{padding:12px 14px;background:#141928;border:1px solid #1e2640;border-radius:14px;color:#e2e8f0;cursor:pointer;font-size:20px;flex-shrink:0}
     .add-btn{flex:1;padding:12px;border-radius:14px;border:none;font-size:14px;font-weight:700;cursor:pointer}
     .add-btn.on{background:#4ade80;color:#080b14}
     .add-btn:not(.on){background:#141928;color:#4a5568;cursor:not-allowed}
- 
+
     .key-hint{font-size:11px;color:#4a5568;text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline}
- 
+
     .meal-group{background:#0f1420;border-radius:20px;margin-bottom:10px;border:1px solid #1e2640;overflow:hidden}
     .grp-head{padding:13px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e2640}
     .grp-title{font-weight:700}
@@ -104,7 +100,7 @@ Kopieren
     .meal-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
     .meal-kcal{font-weight:800;font-size:16px}
     .del{background:none;border:none;color:#4a5568;cursor:pointer;font-size:18px;padding:0}
- 
+
     .hist-card{background:#0f1420;border-radius:18px;margin-bottom:10px;border:1px solid #1e2640;padding:16px 18px;cursor:pointer}
     .hist-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
     .hist-date{font-weight:700;font-size:14px}
@@ -114,21 +110,21 @@ Kopieren
     .prog-bg{height:6px;background:#141928;border-radius:99px;overflow:hidden}
     .prog-fill{height:100%;border-radius:99px}
     .prog-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#4a5568}
- 
+
     .empty{text-align:center;color:#4a5568;padding:40px 0;font-size:14px;line-height:1.9}
- 
+
     @keyframes spin{to{transform:rotate(360deg)}}
     .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#080b14;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
   </style>
 </head>
 <body>
- 
+
 <!-- SETUP SCREEN -->
 <div id="setup">
   <div class="icon">🥗</div>
   <h1>Kalorien-Tracker</h1>
   <p>Einmalig einen kostenlosen Google Gemini API-Key eingeben.</p>
- 
+
   <div class="steps">
     <div class="step">
       <div class="step-num">1</div>
@@ -147,12 +143,12 @@ Kopieren
       <div>Hier einfügen → Fertig ✓</div>
     </div>
   </div>
- 
+
   <input type="password" id="keyInput" placeholder="AIza..."/>
   <div class="err" id="setupErr"></div>
   <button onclick="saveKey()" style="margin-top:10px">Speichern &amp; Starten →</button>
 </div>
- 
+
 <!-- MAIN APP -->
 <div id="app">
   <div class="nav">
@@ -167,22 +163,22 @@ Kopieren
   </div>
   <div class="wrap" id="content"></div>
 </div>
- 
+
 <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none" onchange="onFile(event)"/>
- 
+
 <script>
 const GOAL = 2350;
 const TYPES = ["Fruehstueck","Mittagessen","Abendessen","Snack"];
 const TLABEL = {Fruehstueck:"Frühstück",Mittagessen:"Mittagessen",Abendessen:"Abendessen",Snack:"Snack"};
 const TICON = {Fruehstueck:"☀️",Mittagessen:"🌤️",Abendessen:"🌙",Snack:"🍎"};
- 
+
 let apiKey="", view="today", activeDate=todayStr(), meals=[], mealType="Fruehstueck";
 let txtIn="", imgData=null, imgMime=null, imgSrc=null, loading=false, errMsg="";
- 
+
 // ── Date ──────────────────────────────────────────────────────────────────────
 function todayStr(){return new Date().toISOString().slice(0,10)}
 function fmtDate(iso){return new Date(iso+"T12:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}
- 
+
 // ── Storage ───────────────────────────────────────────────────────────────────
 function loadMeals(d){try{return JSON.parse(localStorage.getItem("kt:"+d)||"[]")}catch{return[]}}
 function saveMeals(d,m){localStorage.setItem("kt:"+d,JSON.stringify(m))}
@@ -194,10 +190,10 @@ function allDates(){
   }
   return keys.sort().reverse();
 }
- 
+
 // ── Color ─────────────────────────────────────────────────────────────────────
 function rcol(pct){return pct<75?"#4ade80":pct<95?"#fb923c":"#f87171"}
- 
+
 // ── API Key ───────────────────────────────────────────────────────────────────
 function saveKey(){
   const v=document.getElementById("keyInput").value.trim();
@@ -206,14 +202,14 @@ function saveKey(){
   apiKey=v;
   boot();
 }
- 
+
 function boot(){
   document.getElementById("setup").style.display="none";
   document.getElementById("app").classList.add("on");
   meals=loadMeals(activeDate);
   render();
 }
- 
+
 // ── Gemini API ────────────────────────────────────────────────────────────────
 async function callGemini(parts){
   const url="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key="+apiKey;
@@ -231,7 +227,7 @@ async function callGemini(parts){
   const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||"{}";
   return JSON.parse(raw.replace(/```json|```/g,"").trim());
 }
- 
+
 async function analyze(){
   if(loading||(!txtIn.trim()&&!imgData))return;
   loading=true;errMsg="";render();
@@ -252,7 +248,7 @@ async function analyze(){
   }catch(e){errMsg="Fehler: "+e.message}
   loading=false;render();
 }
- 
+
 // ── File ──────────────────────────────────────────────────────────────────────
 function onFile(e){
   const f=e.target.files[0];if(!f)return;
@@ -266,7 +262,7 @@ function onFile(e){
   reader.readAsDataURL(f);
   e.target.value="";
 }
- 
+
 // ── View ──────────────────────────────────────────────────────────────────────
 function setView(v){
   view=v;
@@ -275,19 +271,19 @@ function setView(v){
   });
   render();
 }
- 
+
 function openDay(d){
   activeDate=d;meals=loadMeals(d);setView("today");
 }
- 
+
 function delMeal(id){
   meals=meals.filter(m=>m.id!==id);saveMeals(activeDate,meals);render();
 }
- 
+
 function setType(t){mealType=t;render()}
 function clearImg(){imgData=null;imgMime=null;imgSrc=null;render()}
 function resetKey(){if(confirm("API-Key löschen?")){{localStorage.removeItem("kt:apikey");location.reload()}}}
- 
+
 // ── Render ────────────────────────────────────────────────────────────────────
 function render(){
   const nt=document.getElementById("navTitle");
@@ -299,7 +295,7 @@ function render(){
     renderHistory();
   }
 }
- 
+
 function renderToday(){
   const tot=meals.reduce((s,m)=>s+(m.kcal||0),0);
   const totP=meals.reduce((s,m)=>s+(m.protein||0),0);
@@ -313,7 +309,7 @@ function renderToday(){
   const mt=totP+totF+totC||1;
   const grp={};TYPES.forEach(t=>{grp[t]=meals.filter(m=>m.type===t)});
   const canAdd=!loading&&(txtIn.trim().length>0||!!imgData);
- 
+
   let h=`
   <div class="card">
     <div class="ring-wrap">
@@ -344,7 +340,7 @@ function renderToday(){
     </div>
     ${rem<0?`<div class="over">Tagesziel um ${Math.abs(rem)} kcal überschritten</div>`:""}
   </div>
- 
+
   <div class="card">
     <div class="sec-label">Mahlzeit erfassen</div>
     <div class="type-row">
@@ -368,7 +364,7 @@ function renderToday(){
     </div>
     <div class="key-hint" onclick="resetKey()">🔑 API-Key ändern</div>
   </div>`;
- 
+
   if(!meals.length){
     h+=`<div class="empty">Noch keine Einträge.<br>Text eingeben oder Foto aufnehmen.</div>`;
   } else {
@@ -396,10 +392,10 @@ function renderToday(){
       </div>`;
     });
   }
- 
+
   document.getElementById("content").innerHTML=h;
 }
- 
+
 function renderHistory(){
   const dates=allDates();
   let h="";
@@ -423,7 +419,7 @@ function renderHistory(){
   }
   document.getElementById("content").innerHTML=h;
 }
- 
+
 // ── Boot ──────────────────────────────────────────────────────────────────────
 window.addEventListener("DOMContentLoaded",()=>{
   apiKey=localStorage.getItem("kt:apikey")||"";
