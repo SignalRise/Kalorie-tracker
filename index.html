@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Kalorien"/>
+  <meta name="theme-color" content="#080b14"/>
+  <title>Kalorien-Tracker</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:#080b14;color:#e2e8f0;font-family:system-ui,-apple-system,sans-serif}
+    body{overscroll-behavior:none}
+    textarea,input,button{-webkit-appearance:none;font-family:inherit}
+    ::-webkit-scrollbar{display:none}
+
+    /* SETUP */
+    #setup{position:fixed;inset:0;background:#080b14;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;z-index:100}
+    #setup .icon{font-size:52px;margin-bottom:16px}
+    #setup h1{color:#e2e8f0;font-size:22px;font-weight:800;margin-bottom:8px}
+    #setup p{color:#4a5568;font-size:13px;text-align:center;line-height:1.7;margin-bottom:24px}
+    #setup .steps{background:#0f1420;border:1px solid #1e2640;border-radius:16px;padding:16px;margin-bottom:20px;width:100%;max-width:400px}
+    #setup .step{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:13px;color:#94a3b8}
+    #setup .step:last-child{margin-bottom:0}
+    #setup .step-num{background:#4ade80;color:#080b14;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px}
+    #setup .step a{color:#4ade80;text-decoration:none}
+    #setup input{width:100%;max-width:400px;background:#0f1420;border:1px solid #1e2640;border-radius:14px;padding:14px;color:#e2e8f0;font-size:14px;margin-bottom:10px}
+    #setup input:focus{outline:none;border-color:#4ade80}
+    #setup button{width:100%;max-width:400px;padding:14px;border-radius:14px;border:none;background:#4ade80;color:#080b14;font-size:15px;font-weight:700;cursor:pointer}
+    #setup .err{color:#f87171;font-size:12px;margin-top:6px;text-align:center}
+
+    /* APP */
+    #app{display:none;min-height:100vh}
+    #app.on{display:block}
+
+    .nav{position:sticky;top:0;z-index:10;background:#080b14;border-bottom:1px solid #1e2640;padding:14px 20px;padding-top:max(14px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center}
+    .nav-sub{font-size:10px;color:#4a5568;letter-spacing:2px;text-transform:uppercase}
+    .nav-title{font-size:15px;font-weight:700}
+    .tabs{display:flex;gap:6px}
+    .tab{padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+    .tab.on{background:#4ade80;color:#080b14}
+    .tab:not(.on){background:#141928;color:#4a5568}
+
+    .wrap{max-width:480px;margin:0 auto;padding:20px 16px 100px}
+
+    .card{background:#0f1420;border-radius:24px;border:1px solid #1e2640;padding:24px;margin-bottom:16px}
+    .sec-label{font-size:11px;font-weight:600;color:#4a5568;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+
+    /* Ring */
+    .ring-wrap{position:relative;width:176px;height:176px;margin:0 auto}
+    .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .ring-num{font-size:30px;font-weight:800;line-height:1}
+    .ring-sub{font-size:11px;color:#4a5568;margin-top:2px}
+
+    .macro-bar{display:flex;height:6px;border-radius:99px;overflow:hidden;gap:2px;margin-top:16px}
+    .macro-row{display:flex;justify-content:space-between;margin-top:8px}
+    .macro-item{text-align:center}
+    .macro-val{font-size:13px;font-weight:700}
+    .macro-lbl{font-size:10px;color:#4a5568}
+
+    .stat-row{display:flex;gap:8px;margin-top:16px}
+    .stat-box{flex:1;background:#141928;border-radius:14px;padding:12px;text-align:center}
+    .stat-val{font-size:15px;font-weight:700}
+    .stat-lbl{font-size:11px;color:#4a5568;margin-top:2px}
+    .over{margin-top:12px;background:rgba(127,29,29,.2);border:1px solid #f87171;border-radius:12px;padding:8px 14px;font-size:13px;color:#f87171;text-align:center}
+
+    .type-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+    .type-btn{padding:5px 12px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer}
+    .type-btn.on{background:#4ade80;color:#080b14}
+    .type-btn:not(.on){background:#141928;color:#4a5568}
+
+    .img-prev{position:relative;margin-bottom:10px}
+    .img-prev img{width:100%;max-height:180px;object-fit:cover;border-radius:14px}
+    .img-x{position:absolute;top:8px;right:8px;background:rgba(0,0,0,.8);border:none;color:#fff;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .img-badge{position:absolute;bottom:8px;left:10px;background:rgba(0,0,0,.75);border-radius:8px;padding:3px 8px;font-size:11px;color:#4ade80}
+
+    textarea.input{width:100%;background:#080b14;border:1px solid #1e2640;border-radius:14px;padding:12px;color:#e2e8f0;font-size:14px;resize:none;line-height:1.5}
+    textarea.input:focus{outline:none;border-color:#4ade80}
+    .err-msg{color:#f87171;font-size:12px;margin-top:6px}
+
+    .add-row{display:flex;gap:8px;margin-top:10px}
+    .cam-btn{padding:12px 14px;background:#141928;border:1px solid #1e2640;border-radius:14px;color:#e2e8f0;cursor:pointer;font-size:20px;flex-shrink:0}
+    .add-btn{flex:1;padding:12px;border-radius:14px;border:none;font-size:14px;font-weight:700;cursor:pointer}
+    .add-btn.on{background:#4ade80;color:#080b14}
+    .add-btn:not(.on){background:#141928;color:#4a5568;cursor:not-allowed}
+
+    .key-hint{font-size:11px;color:#4a5568;text-align:center;margin-top:10px;cursor:pointer;text-decoration:underline}
+
+    .meal-group{background:#0f1420;border-radius:20px;margin-bottom:10px;border:1px solid #1e2640;overflow:hidden}
+    .grp-head{padding:13px 18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e2640}
+    .grp-title{font-weight:700}
+    .grp-kcal{color:#4ade80;font-weight:700}
+    .meal-row{padding:12px 18px;border-bottom:1px solid #1e2640;display:flex;gap:10px;align-items:flex-start}
+    .meal-row:last-child{border-bottom:none}
+    .meal-info{flex:1}
+    .meal-name{font-weight:600;font-size:14px;margin-bottom:3px}
+    .meal-note{font-size:12px;color:#4a5568;margin-bottom:5px}
+    .meal-macros{display:flex;gap:10px;font-size:11px}
+    .meal-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .meal-kcal{font-weight:800;font-size:16px}
+    .del{background:none;border:none;color:#4a5568;cursor:pointer;font-size:18px;padding:0}
+
+    .hist-card{background:#0f1420;border-radius:18px;margin-bottom:10px;border:1px solid #1e2640;padding:16px 18px;cursor:pointer}
+    .hist-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .hist-date{font-weight:700;font-size:14px}
+    .hist-cnt{font-size:11px;color:#4a5568}
+    .hist-num{font-weight:800;font-size:18px}
+    .hist-lbl{font-size:11px;color:#4a5568}
+    .prog-bg{height:6px;background:#141928;border-radius:99px;overflow:hidden}
+    .prog-fill{height:100%;border-radius:99px}
+    .prog-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:#4a5568}
+
+    .empty{text-align:center;color:#4a5568;padding:40px 0;font-size:14px;line-height:1.9}
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.2);border-top-color:#080b14;border-radius:50%;animation:spin .7s linear infinite;margin-right:6px;vertical-align:middle}
+  </style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup">
+  <div class="icon">🥗</div>
+  <h1>Kalorien-Tracker</h1>
+  <p>Einmalig einen kostenlosen Google Gemini API-Key eingeben.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>Gehe zu <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a></div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>Mit Google-Account einloggen</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>„Create API Key" klicken → Key kopieren</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div>Hier einfügen → Fertig ✓</div>
+    </div>
+  </div>
+
+  <input type="password" id="keyInput" placeholder="AIza..."/>
+  <div class="err" id="setupErr"></div>
+  <button onclick="saveKey()" style="margin-top:10px">Speichern &amp; Starten →</button>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="nav">
+    <div>
+      <div class="nav-sub">Kalorien-Tracker</div>
+      <div class="nav-title" id="navTitle">Heute</div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" onclick="setView('today')">Heute</button>
+      <button class="tab" onclick="setView('history')">Verlauf</button>
+    </div>
+  </div>
+  <div class="wrap" id="content"></div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none" onchange="onFile(event)"/>
+
+<script>
+const GOAL = 2350;
+const TYPES = ["Fruehstueck","Mittagessen","Abendessen","Snack"];
+const TLABEL = {Fruehstueck:"Frühstück",Mittagessen:"Mittagessen",Abendessen:"Abendessen",Snack:"Snack"};
+const TICON = {Fruehstueck:"☀️",Mittagessen:"🌤️",Abendessen:"🌙",Snack:"🍎"};
+
+let apiKey="", view="today", activeDate=todayStr(), meals=[], mealType="Fruehstueck";
+let txtIn="", imgData=null, imgMime=null, imgSrc=null, loading=false, errMsg="";
+
+// ── Date ──────────────────────────────────────────────────────────────────────
+function todayStr(){return new Date().toISOString().slice(0,10)}
+function fmtDate(iso){return new Date(iso+"T12:00:00").toLocaleDateString("de-DE",{weekday:"long",day:"numeric",month:"long"})}
+
+// ── Storage ───────────────────────────────────────────────────────────────────
+function loadMeals(d){try{return JSON.parse(localStorage.getItem("kt:"+d)||"[]")}catch{return[]}}
+function saveMeals(d,m){localStorage.setItem("kt:"+d,JSON.stringify(m))}
+function allDates(){
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith("kt:"))keys.push(k.slice(3));
+  }
+  return keys.sort().reverse();
+}
+
+// ── Color ─────────────────────────────────────────────────────────────────────
+function rcol(pct){return pct<75?"#4ade80":pct<95?"#fb923c":"#f87171"}
+
+// ── API Key ───────────────────────────────────────────────────────────────────
+function saveKey(){
+  const v=document.getElementById("keyInput").value.trim();
+  if(!v.startsWith("AIza")){document.getElementById("setupErr").textContent="Ungültiger Key. Er beginnt mit 'AIza...'";return}
+  localStorage.setItem("kt:apikey",v);
+  apiKey=v;
+  boot();
+}
+
+function boot(){
+  document.getElementById("setup").style.display="none";
+  document.getElementById("app").classList.add("on");
+  meals=loadMeals(activeDate);
+  render();
+}
+
+// ── Gemini API ────────────────────────────────────────────────────────────────
+async function callGemini(parts){
+  const url="https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+apiKey;
+  const res=await fetch(url,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      contents:[{parts}],
+      generationConfig:{temperature:0.1},
+      systemInstruction:{parts:[{text:"Du bist Ernaehrungsexperte. Antworte NUR mit JSON ohne Markdown oder Erklaerung: {\"name\":\"Name auf Deutsch\",\"kcal\":Zahl,\"protein\":Zahl,\"fat\":Zahl,\"carbs\":Zahl,\"note\":\"kurze Einschaetzung 1 Satz auf Deutsch\"}"}]}
+    })
+  });
+  const data=await res.json();
+  if(data.error)throw new Error(data.error.message);
+  const raw=data.candidates?.[0]?.content?.parts?.[0]?.text||"{}";
+  return JSON.parse(raw.replace(/```json|```/g,"").trim());
+}
+
+async function analyze(){
+  if(loading||(!txtIn.trim()&&!imgData))return;
+  loading=true;errMsg="";render();
+  try{
+    let parts;
+    if(imgData){
+      parts=[
+        {inline_data:{mime_type:imgMime,data:imgData}},
+        {text:txtIn.trim()?"Foto analysieren. Zusatzinfo: "+txtIn:"Analysiere diese Mahlzeit auf dem Foto. Schaetze Mengen realistisch."}
+      ];
+    } else {
+      parts=[{text:txtIn}];
+    }
+    const r=await callGemini(parts);
+    meals.push({...r,type:mealType,id:Date.now(),hasImg:!!imgData});
+    saveMeals(activeDate,meals);
+    txtIn="";imgData=null;imgMime=null;imgSrc=null;
+  }catch(e){errMsg="Fehler: "+e.message}
+  loading=false;render();
+}
+
+// ── File ──────────────────────────────────────────────────────────────────────
+function onFile(e){
+  const f=e.target.files[0];if(!f)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    imgSrc=ev.target.result;
+    imgData=imgSrc.split(",")[1];
+    imgMime=f.type;
+    render();
+  };
+  reader.readAsDataURL(f);
+  e.target.value="";
+}
+
+// ── View ──────────────────────────────────────────────────────────────────────
+function setView(v){
+  view=v;
+  document.querySelectorAll(".tab").forEach((b,i)=>{
+    b.classList.toggle("on",(i===0&&v==="today")||(i===1&&v==="history"));
+  });
+  render();
+}
+
+function openDay(d){
+  activeDate=d;meals=loadMeals(d);setView("today");
+}
+
+function delMeal(id){
+  meals=meals.filter(m=>m.id!==id);saveMeals(activeDate,meals);render();
+}
+
+function setType(t){mealType=t;render()}
+function clearImg(){imgData=null;imgMime=null;imgSrc=null;render()}
+function resetKey(){if(confirm("API-Key löschen?")){{localStorage.removeItem("kt:apikey");location.reload()}}}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render(){
+  const nt=document.getElementById("navTitle");
+  if(view==="today"){
+    nt.textContent=activeDate===todayStr()?"Heute":fmtDate(activeDate);
+    renderToday();
+  } else {
+    nt.textContent="Verlauf";
+    renderHistory();
+  }
+}
+
+function renderToday(){
+  const tot=meals.reduce((s,m)=>s+(m.kcal||0),0);
+  const totP=meals.reduce((s,m)=>s+(m.protein||0),0);
+  const totF=meals.reduce((s,m)=>s+(m.fat||0),0);
+  const totC=meals.reduce((s,m)=>s+(m.carbs||0),0);
+  const rem=GOAL-tot;
+  const pct=Math.min((tot/GOAL)*100,100);
+  const col=rcol(pct);
+  const r=68,circ=2*Math.PI*r;
+  const dash=((pct/100)*circ)+" "+circ;
+  const mt=totP+totF+totC||1;
+  const grp={};TYPES.forEach(t=>{grp[t]=meals.filter(m=>m.type===t)});
+  const canAdd=!loading&&(txtIn.trim().length>0||!!imgData);
+
+  let h=`
+  <div class="card">
+    <div class="ring-wrap">
+      <svg width="176" height="176" style="transform:rotate(-90deg)">
+        <circle cx="88" cy="88" r="${r}" fill="none" stroke="#141928" stroke-width="12"/>
+        <circle cx="88" cy="88" r="${r}" fill="none" stroke="${col}" stroke-width="12"
+          stroke-dasharray="${dash}" stroke-linecap="round" style="transition:stroke-dasharray .5s"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-num" style="color:${col}">${tot}</div>
+        <div class="ring-sub">von ${GOAL} kcal</div>
+        <div class="ring-sub">${Math.round(pct)}%</div>
+      </div>
+    </div>
+    <div class="macro-bar">
+      <div style="width:${totP/mt*100}%;background:#60a5fa"></div>
+      <div style="width:${totF/mt*100}%;background:#fbbf24"></div>
+      <div style="width:${totC/mt*100}%;background:#a78bfa"></div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-item"><div class="macro-val" style="color:#60a5fa">${Math.round(totP)}g</div><div class="macro-lbl">Protein</div></div>
+      <div class="macro-item"><div class="macro-val" style="color:#fbbf24">${Math.round(totF)}g</div><div class="macro-lbl">Fett</div></div>
+      <div class="macro-item"><div class="macro-val" style="color:#a78bfa">${Math.round(totC)}g</div><div class="macro-lbl">Kohlenhydrate</div></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val" style="color:#4a5568">${GOAL} kcal</div><div class="stat-lbl">Tagesziel</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${rem<0?"#f87171":"#4ade80"}">${Math.abs(rem)} kcal</div><div class="stat-lbl">${rem<0?"Überzogen":"Noch frei"}</div></div>
+    </div>
+    ${rem<0?`<div class="over">Tagesziel um ${Math.abs(rem)} kcal überschritten</div>`:""}
+  </div>
+
+  <div class="card">
+    <div class="sec-label">Mahlzeit erfassen</div>
+    <div class="type-row">
+      ${TYPES.map(t=>`<button class="type-btn ${mealType===t?"on":""}" onclick="setType('${t}')">${TICON[t]} ${TLABEL[t]}</button>`).join("")}
+    </div>
+    ${imgSrc?`
+    <div class="img-prev">
+      <img src="${imgSrc}"/>
+      <button class="img-x" onclick="clearImg()">×</button>
+      <div class="img-badge">📸 KI analysiert Foto</div>
+    </div>`:""}
+    <textarea class="input" rows="${imgData?2:3}"
+      placeholder="${imgData?"Optionale Hinweise zum Foto…":"Mahlzeit beschreiben oder Foto aufnehmen…"}"
+      oninput="txtIn=this.value">${txtIn}</textarea>
+    ${errMsg?`<div class="err-msg">${errMsg}</div>`:""}
+    <div class="add-row">
+      <button class="cam-btn" onclick="document.getElementById('fileInput').click()">📷</button>
+      <button class="add-btn ${canAdd?"on":""}" onclick="analyze()">
+        ${loading?'<span class="spin"></span>Analysiere…':imgData?"📸 Foto analysieren":"➕ Hinzufügen"}
+      </button>
+    </div>
+    <div class="key-hint" onclick="resetKey()">🔑 API-Key ändern</div>
+  </div>`;
+
+  if(!meals.length){
+    h+=`<div class="empty">Noch keine Einträge.<br>Text eingeben oder Foto aufnehmen.</div>`;
+  } else {
+    TYPES.forEach(t=>{
+      const items=grp[t];if(!items.length)return;
+      const tk=items.reduce((s,m)=>s+(m.kcal||0),0);
+      h+=`<div class="meal-group">
+        <div class="grp-head"><span class="grp-title">${TICON[t]} ${TLABEL[t]}</span><span class="grp-kcal">${tk} kcal</span></div>
+        ${items.map(m=>`
+        <div class="meal-row">
+          <div class="meal-info">
+            <div class="meal-name">${m.hasImg?"📸 ":""}${m.name||""}</div>
+            <div class="meal-note">${m.note||""}</div>
+            <div class="meal-macros">
+              <span style="color:#60a5fa">P ${Math.round(m.protein||0)}g</span>
+              <span style="color:#fbbf24">F ${Math.round(m.fat||0)}g</span>
+              <span style="color:#a78bfa">K ${Math.round(m.carbs||0)}g</span>
+            </div>
+          </div>
+          <div class="meal-right">
+            <span class="meal-kcal">${m.kcal}</span>
+            <button class="del" onclick="delMeal(${m.id})">×</button>
+          </div>
+        </div>`).join("")}
+      </div>`;
+    });
+  }
+
+  document.getElementById("content").innerHTML=h;
+}
+
+function renderHistory(){
+  const dates=allDates();
+  let h="";
+  if(!dates.length){
+    h=`<div class="empty">Noch kein Verlauf vorhanden.</div>`;
+  } else {
+    dates.slice(0,30).forEach(d=>{
+      const dm=loadMeals(d);
+      const kcal=dm.reduce((s,m)=>s+(m.kcal||0),0);
+      const pct=Math.min((kcal/GOAL)*100,100);
+      const col=rcol(pct);
+      h+=`<div class="hist-card" onclick="openDay('${d}')">
+        <div class="hist-head">
+          <div><div class="hist-date">${d===todayStr()?"Heute":fmtDate(d)}</div><div class="hist-cnt">${dm.length} Einträge</div></div>
+          <div style="text-align:right"><div class="hist-num" style="color:${col}">${kcal}</div><div class="hist-lbl">kcal</div></div>
+        </div>
+        <div class="prog-bg"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>
+        <div class="prog-labels"><span>0</span><span>Ziel: ${GOAL} kcal</span></div>
+      </div>`;
+    });
+  }
+  document.getElementById("content").innerHTML=h;
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+window.addEventListener("DOMContentLoaded",()=>{
+  apiKey=localStorage.getItem("kt:apikey")||"";
+  if(apiKey)boot();
+});
+</script>
+</body>
+</html>
